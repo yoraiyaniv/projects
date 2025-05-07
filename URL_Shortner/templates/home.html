@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        input[type="url"], input[type="text"], input[type="submit"], button {
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        input[type="url"], input[type="text"] {
+            flex: 1;
+            border: 1px solid #d1d1d1;
+        }
+        input[type="submit"], button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #218838;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            margin-top: -10px;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        .flash-message {
+            margin-top: 20px;
+            color: #155724;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+        .short-url {
+            margin-top: 20px;
+            color: #007bff;
+            background-color: #e9f7ff;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #cde5ff;
+            display: inline-block;
+            word-wrap: break-word;
+        }
+        .short-url a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .short-url a:hover {
+            text-decoration: underline;
+        }
+        .sidebar {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-left: 20px;
+            max-width: 250px; /* Adjust the width as needed */
+            position: absolute; /* Position it on the left side */
+            top: 50px; /* Adjust top position */
+            left: 20px; /* Adjust left position */
+            height: calc(100% - 60px); /* Ensure it occupies the remaining height */
+            overflow-y: auto; /* Add scroll if content overflows */
+        }
+        
+        .sidebar h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .sidebar ul li {
+            margin-bottom: 10px;
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Center items vertically */
+        }
+        
+        .sidebar ul li a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+        
+        .remove-url-btn {
+            background: none;
+            border: none;
+            color: #dc3545; /* Red color for the trash can */
+            cursor: pointer;
+            margin-left: 10px; /* Space between URL and icon */
+            align-items: center; /* Center items vertically */
+            display: flex; /* Use flex to align items */
+        }
+        
+        .remove-url-btn i {
+            font-size: 16px; /* Size of the trash can icon */
+        }
+        
+        .remove-url-btn:hover {
+            color: #c82333; /* Darker red on hover */
+            margin-left: 10px; /* Space between URL and icon */
+            cursor: pointer;
+        }
+        .remove-all-btn {
+            background-color: #dc3545; /* Red color for the remove all button */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px; /* Space below the button */
+            font-size: 16px; /* Font size for better visibility */
+            display: inline-block; /* Aligns properly */
+            transition: background-color 0.3s;
+            
+        }
+        
+        .remove-all-btn:hover {
+            background-color: #c82333; /* Darker red on hover */
+        }
+
+        .url-text {
+            flex: 1; /* Take up available space for the URL */
+            display: flex; /* Use flexbox to align items */
+            align-items: center; /* Center items vertically */        
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <form method="POST" action="/">
+            <label for="url">Enter URL:</label>
+            <input type="url" id="url" name="url" placeholder="https://example.com" required>
+            <input type="submit" value="Shorten URL" name="assign">
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Display the shortened URL if available -->
+        {% if short_url %}
+            <div class="short-url">
+                Your shortened URL: <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Side panel to display shortened URLs -->
+    <div class="sidebar">
+        <h2>Shortened URLs</h2>
+        <ul>
+            {% if shortened_urls %}
+            {% for url in shortened_urls %}
+                <li>
+                    <span class="url-text">
+                        <a href="{{ url }}" target="_blank">{{ url }}</a>
+                    </span>
+                    <form method="POST" action="/" style="display:inline;">
+                        <input type="hidden" name="url" value="{{ url }}">
+                        <button type="submit" class="remove-url-btn" name="remove">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </li>
+            {% endfor %}
+            {% endif %}
+        </ul>
+        <form method="POST" action="/" style="display:inline;">
+            {% if shortened_urls %}
+            <button type="submit" class="remove-all-btn" name="remove_all">Remove All Links</button>
+            {% else %}
+            <button type="submit" class="remove-all-btn" name="remove_all" style="background-color: rgb(165, 146, 146)" disabled>Remove All Links</button>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
