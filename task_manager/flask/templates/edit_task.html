@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Task - AssistAI</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.webp') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Edit Task</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" value="{{ task.title }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" required>{{ task.description }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="objective">Objective</label>
+                <select id="objective" name="objective" required>
+                    {% for objective in objectives %}
+                        <option value="{{ objective.name }}" 
+                                {% if objective.name == task.objective.name %}selected{% endif %}>
+                            {{ objective.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="due_date">Due Date</label>
+                <input type="date" id="due_date" name="due_date" 
+                       value="{{ task.deadline.strftime('%Y-%m-%d') }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority" required>
+                    <option value="1" {% if task.priority.value == 1 %}selected{% endif %}>Low</option>
+                    <option value="2" {% if task.priority.value == 2 %}selected{% endif %}>Medium</option>
+                    <option value="3" {% if task.priority.value == 3 %}selected{% endif %}>High</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="submit-button">Save Changes</button>
+                <a href="{{ url_for('home') }}" class="cancel-button">Cancel</a>
+                <button type="button" 
+                        class="delete-button" 
+                        onclick="confirmDeleteTask({{ task.id }})">
+                    Delete Task
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function confirmDeleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task? This cannot be undone.')) {
+                window.location.href = `/delete-task/${taskId}`;
+            }
+        }
+    </script>
+</body>
+</html>

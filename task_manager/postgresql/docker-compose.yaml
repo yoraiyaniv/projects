@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tasks
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../postgresql:/docker-entrypoint-initdb.d
+
+  flask_server:
+    image: python:3.11
+    container_name: flask_server
+    depends_on:
+      - postgres
+    volumes:
+      - ../flask:/app
+      - ../core:/core
+      - ../requirements.txt:/requirements.txt
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    command: >
+      bash -c "pip install -r ../requirements.txt && python app.py"
+volumes:
+  postgres_data:

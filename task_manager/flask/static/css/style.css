@@ -1,0 +1,736 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    margin: 0;
+    padding: 0;
+    color: #333;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.task-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    overflow: hidden;
+    margin: 15px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+.task-title {
+    margin: 0 0 16px 0;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: linear-gradient(45deg, #007bff, #00bfff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.task-description {
+    color: #666;
+    margin-bottom: 12px;
+}
+.floating-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, #007bff, #00bfff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.floating-button:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.floating-button i {
+    font-size: 24px;
+} 
+
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+.form-container h1 {
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="color"],
+.form-group input[type="date"],
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Specific styling for the color input */
+.form-group input[type="color"] {
+    height: 40px;
+    padding: 2px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #00bfff);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Add these new animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Add styles for form inputs */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.form-group select,
+select[name="objective"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.form-group select:focus,
+select[name="objective"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.task-card.priority-high {
+    background-color: rgba(255, 200, 200, 0.3);  /* Slightly stronger light red */
+}
+
+.task-card.priority-medium {
+    background-color: rgba(255, 193, 7, 0.2);  /* Light yellow */
+}
+
+.task-card.priority-low {
+    background-color: rgba(40, 167, 69, 0.1);  /* Light green */
+}
+
+/* Add priority label */
+.task-card::after {
+    content: attr(data-priority);
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.task-card.priority-high::after {
+    background-color: #dc3545;
+    color: white;
+}
+
+.task-card.priority-medium::after {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.task-card.priority-low::after {
+    background-color: #28a745;
+    color: white;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.delete-button {
+    color: #ff4444;
+    text-decoration: none;
+    padding: 5px;
+}
+
+.delete-button:hover {
+    color: #cc0000;
+}
+
+.tabs-container {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    padding: 10px 0 0;
+    border-radius: 10px 10px 0 0;
+    margin: 0 auto;
+    max-width: 1200px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabs {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.tab-button {
+    padding: 12px 24px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-button:hover {
+    background: #f5f5f5;
+}
+
+.tab-button.active {
+    color: #007bff;
+    background: #f8f9fa;
+}
+
+.tab-content {
+    display: none;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.add-objective-button {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-objective-button:hover {
+    background: #e9ecef;
+    border-color: #007bff;
+    color: #007bff;
+}
+
+input[type="color"] {
+    width: 100%;
+    height: 40px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.submit-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.cancel-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+}
+
+.delete-button {
+    background-color: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;
+    font-size: 14px;
+}
+
+.delete-button:hover {
+    background-color: #dc3545;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Add subtle shadow on button hover */
+.submit-button:hover,
+.cancel-button:hover,
+.delete-button:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Add active state for buttons */
+.submit-button:active,
+.cancel-button:active,
+.delete-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.slider-container {
+    width: 100%;
+    padding: 10px 0;
+    box-sizing: border-box;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #ddd;
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    transition: background .15s ease-in-out;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    transition: background .15s ease-in-out;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    background: #0056b3;
+}
+
+.slider::-moz-range-thumb:hover {
+    background: #0056b3;
+}
+
+#progress-value {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.tab-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.progress-bar-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background-color: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    transition: width 0.3s ease;
+    opacity: 0.8;
+}
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-button {
+    color: #ffc107;
+    text-decoration: none;
+    padding: 5px;
+}
+
+.edit-button:hover {
+    color: #e0a800;
+}
+
+.tab-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.edit-objective-button {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.8em;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.edit-objective-button:hover {
+    opacity: 1;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: #999;
+    margin-right: 8px;
+    font-size: 0.8em;
+}
+
+.tab-wrapper {
+    cursor: grab;
+    user-select: none;
+}
+
+.tab-wrapper.drag-over {
+    border-right: 2px solid #007bff;
+}
+
+.tab-wrapper:active {
+    cursor: grabbing;
+}
+
+.tab-wrapper.dragging {
+    opacity: 0.5;
+}
+
+.task-drag-handle {
+    cursor: grab;
+    color: #999;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.task-card {
+    cursor: grab;
+    user-select: none;
+}
+
+.task-card:active {
+    cursor: grabbing;
+}
+
+.task-card.dragging {
+    opacity: 0.5;
+    position: relative;
+    z-index: 1000;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+}
+
+.task-title {
+    flex-grow: 1;
+    margin: 0 10px;
+}
+
+.tasks-container {
+    min-height: 100px;
+    padding: 10px 0;
+}
+
+.objective-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+}
+
+.delete-objective-button {
+    color: #dc3545;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.delete-objective-button:hover {
+    opacity: 1;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: auto; /* Pushes delete button to the right */
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+.controls-container {
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 20px;
+}
+
+.sort-controls, .filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+/* Add these rules to remove the digits */
+.task-card::before,
+.task-card::after {
+    display: none !important;
+}
+
+.task-card[data-task-id]::before {
+    display: none !important;
+}
+
+[data-task-id]::before {
+    display: none !important;
+}
+
+/* Remove the digit hiding rules and add the ellipse styles */
+.task-card {
+    position: relative;
+}
+
+.task-card::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #000;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+.priority-high::after {
+    background-color: #dc3545;
+}
+
+.priority-medium::after {
+    background-color: #ffc107;
+}
+
+.priority-low::after {
+    background-color: #28a745;
+}
+
+.task-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 10px;
+}
+
+.task-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.objective-tile {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    color: white;
+    font-weight: 500;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: auto; /* Push to the right */
+    align-self: flex-start; /* Align to top */
+}

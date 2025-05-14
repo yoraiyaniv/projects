@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Objective - AssistAI</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.webp') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Add New Objective</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">Objective Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="color">Color</label>
+                <input type="color" id="color" name="color" value="#007bff" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="progress">Initial Progress: <span id="progress-value">0%</span></label>
+                <div class="slider-container">
+                    <input type="range" 
+                           id="progress" 
+                           name="progress" 
+                           min="0" 
+                           max="100" 
+                           value="0" 
+                           class="slider" 
+                           oninput="updateProgressValue(this.value)">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="submit-button">Create Objective</button>
+                <a href="{{ url_for('home') }}" class="cancel-button">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function updateProgressValue(value) {
+            document.getElementById('progress-value').textContent = value + '%';
+        }
+    </script>
+</body>
+</html>

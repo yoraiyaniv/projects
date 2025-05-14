@@ -1,0 +1,5 @@
+flask/app.txt
+
+__pycache__/
+
+core/emails/

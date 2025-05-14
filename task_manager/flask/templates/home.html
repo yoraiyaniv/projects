@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AssistAI</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.webp') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="tabs-container">
+        <div class="tabs" id="tabs-container">
+            <div class="tab-wrapper">
+                <button class="tab-button {% if not selected_tab %}active{% endif %}" onclick="openTab(event, 'all-tasks')">
+                    All Tasks
+                </button>
+            </div>
+            {% for objective in objectives %}
+                <div class="tab-wrapper" draggable="true" data-objective-name="{{ objective.name }}">
+                    <button class="tab-button {% if selected_tab == objective.name %}active{% endif %}" 
+                            onclick="openTab(event, '{{ objective.name }}')"
+                            style="border-left: 4px solid {{ objective.color }};">
+                        <div class="tab-content-wrapper">
+                            <span class="objective-name">{{ objective.name }}</span>
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill" style="width: {{ objective.progress }}%; background-color: {{ objective.color }}"></div>
+                            </div>
+                        </div>
+                        <div class="objective-settings">
+                            <a href="{{ url_for('edit_objective_route', objective_name=objective.name) }}" class="settings-link">
+                                <i class="fas fa-cog settings-icon"></i>
+                            </a>
+                        </div>
+                    </button>
+                </div>
+            {% endfor %}
+            <div class="tab-wrapper">
+                <button class="tab-button" onclick="toggleObjectiveForm()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Tasks tab content -->
+    <div id="all-tasks" class="tab-content {% if not selected_tab %}active{% endif %}">
+        <div class="container">
+            <div class="controls-container">
+                <div class="sort-controls">
+                    <label for="sort-by">Sort by:</label>
+                    <select id="sort-by" onchange="sortTasks()">
+                        <option value="due-date">Due Date</option>
+                        <option value="priority">Priority</option>
+                    </select>
+                </div>
+                <div class="filter-controls">
+                    <label for="filter-objective">Filter by Objective:</label>
+                    <select id="filter-objective" onchange="filterTasks()">
+                        <option value="all">All Objectives</option>
+                        {% for objective in objectives %}
+                            <option value="{{ objective.name }}">{{ objective.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="tasks-container">
+                {% for task in tasks %}
+                    <div class="task-card priority-{{ task.priority.name.lower() }}" 
+                         style="border-left: 5px solid {{ task.objective.color }};"
+                         data-due-date="{{ task.deadline.strftime('%s') }}"
+                         data-priority="{{ task.priority.value }}"
+                         data-objective="{{ task.objective.name }}"
+                         data-task-id="{{ task.id }}">
+                        <div class="task-header">
+                            <div class="task-drag-handle">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+                            <h2 class="task-title">{{ task.title }}</h2>
+                            <div class="task-actions">
+                                <a href="{{ url_for('edit_task_route', task_id=task.id) }}" class="edit-button">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <p class="task-description">{{ task.description }}</p>
+                        <div class="task-footer">
+                            <div class="task-metadata">
+                                <span class="deadline"><i class="far fa-clock"></i> Due: {{ task.deadline.strftime('%Y-%m-%d') }}</span>
+                                <span class="priority"><i class="fas fa-flag"></i> Priority: {{ task.priority.name }}</span>
+                            </div>
+                            <div class="objective-tile" style="background-color: {{ task.objective.color }}">
+                                {{ task.objective.name }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Individual objective tabs -->
+    {% for objective in objectives %}
+        <div id="{{ objective.name }}" class="tab-content {% if selected_tab == objective.name %}active{% endif %}">
+            <div class="container">
+                <div class="tasks-container" data-objective="{{ objective.name }}">
+                    {% for task in tasks %}
+                        {% if task.objective.name == objective.name %}
+                            <div class="task-card priority-{{ task.priority.name.lower() }}" 
+                                 style="border-left: 5px solid {{ task.objective.color }};"
+                                 draggable="true"
+                                 data-task-id="{{ task.id }}">
+                                <div class="task-header">
+                                    <div class="task-drag-handle">
+                                        <i class="fas fa-grip-vertical"></i>
+                                    </div>
+                                    <h2 class="task-title">{{ task.title }}</h2>
+                                    <div class="task-actions">
+                                        <a href="{{ url_for('edit_task_route', task_id=task.id) }}" class="edit-button">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <p class="task-description">{{ task.description }}</p>
+                                <div class="task-footer">
+                                    <span class="deadline"><i class="far fa-clock"></i> Due: {{ task.deadline }}</span><br>
+                                    <span class="priority"><i class="fas fa-flag"></i> Priority: {{ task.priority.name }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    
+    <a href="/add-task" class="floating-button">
+        <i class="fas fa-plus"></i>
+    </a>
+
+    <!-- Add Objective Form -->
+    <div id="add-objective-form" class="modal" style="display: none;">
+        <div class="modal-content">
+            <form action="/add-objective" method="POST">
+                <div class="form-group">
+                    <label for="objective-name">Objective Name:</label>
+                    <input type="text" id="objective-name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="objective-color">Color:</label>
+                    <input type="color" id="objective-color" name="color" value="#007bff" required>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="submit-button">Add Objective</button>
+                    <button type="button" class="cancel-button" onclick="toggleObjectiveForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabContent, tabButtons;
+            
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            
+            tabButtons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabsContainer = document.getElementById('tabs-container');
+            let draggedItem = null;
+
+            // Add drag event listeners to all tab-wrappers
+            document.querySelectorAll('.tab-wrapper').forEach(tab => {
+                tab.addEventListener('dragstart', handleDragStart);
+                tab.addEventListener('dragend', handleDragEnd);
+                tab.addEventListener('dragover', handleDragOver);
+                tab.addEventListener('drop', handleDrop);
+            });
+
+            function handleDragStart(e) {
+                draggedItem = this;
+                this.style.opacity = '0.4';
+                e.dataTransfer.effectAllowed = 'move';
+            }
+
+            function handleDragEnd(e) {
+                draggedItem.style.opacity = '1';
+                document.querySelectorAll('.tab-wrapper').forEach(tab => {
+                    tab.classList.remove('drag-over');
+                });
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                if (draggedItem !== this) {
+                    const allTabs = [...tabsContainer.querySelectorAll('.tab-wrapper')];
+                    const draggedIndex = allTabs.indexOf(draggedItem);
+                    const droppedIndex = allTabs.indexOf(this);
+
+                    // Update the DOM
+                    if (draggedIndex < droppedIndex) {
+                        this.parentNode.insertBefore(draggedItem, this.nextSibling);
+                    } else {
+                        this.parentNode.insertBefore(draggedItem, this);
+                    }
+
+                    // Get the new order
+                    const newOrder = [...tabsContainer.querySelectorAll('.tab-wrapper')].map(tab => 
+                        tab.dataset.objectiveName
+                    );
+                    
+                    // Silently update the server without forcing a reload
+                    fetch('/update-objective-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ order: newOrder })
+                    })
+                    .catch(error => console.error('Error saving objective order:', error));
+                }
+                this.classList.remove('drag-over');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskContainers = document.querySelectorAll('.tasks-container');
+            let draggedTask = null;
+
+            taskContainers.forEach(container => {
+                container.addEventListener('dragover', handleTaskDragOver);
+                container.addEventListener('drop', handleTaskDrop);
+            });
+
+            document.querySelectorAll('.task-card').forEach(task => {
+                task.addEventListener('dragstart', handleTaskDragStart);
+                task.addEventListener('dragend', handleTaskDragEnd);
+            });
+
+            function handleTaskDragStart(e) {
+                draggedTask = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            }
+
+            function handleTaskDragEnd(e) {
+                draggedTask.classList.remove('dragging');
+                document.querySelectorAll('.task-card').forEach(task => {
+                    task.classList.remove('drag-over');
+                });
+            }
+
+            function handleTaskDragOver(e) {
+                e.preventDefault();
+                const container = this;
+                const afterElement = getDragAfterElement(container, e.clientY);
+                const draggable = draggedTask;
+                
+                if (afterElement == null) {
+                    container.appendChild(draggable);
+                } else {
+                    container.insertBefore(draggable, afterElement);
+                }
+            }
+
+            function handleTaskDrop(e) {
+                e.preventDefault();
+                const container = this;
+                const objectiveName = container.dataset.objective;
+                
+                // Get the new order of tasks
+                const newOrder = [...container.querySelectorAll('.task-card')].map(task => ({
+                    id: task.dataset.taskId,
+                    objective: objectiveName
+                }));
+                
+                // Silently update the server without forcing a reload
+                fetch('/update-task-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tasks: newOrder })
+                })
+                .catch(error => console.error('Error saving task order:', error));
+            }
+
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.task-card:not(.dragging)')];
+
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+        });
+
+        function confirmDeleteObjective(event, objectiveName) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            if (confirm(`Are you sure you want to delete "${objectiveName}" and all its tasks?`)) {
+                window.location.href = `/delete-objective/${objectiveName}`;
+            }
+        }
+
+        function sortTasks() {
+            const container = document.querySelector('#all-tasks .tasks-container');
+            const sortBy = document.getElementById('sort-by').value;
+            const tasks = Array.from(container.getElementsByClassName('task-card'));
+
+            tasks.sort((a, b) => {
+                if (sortBy === 'due-date') {
+                    const dateA = parseInt(a.dataset.dueDate);
+                    const dateB = parseInt(b.dataset.dueDate);
+                    return dateA - dateB;
+                } else { // priority
+                    const priorityA = parseInt(a.dataset.priority);
+                    const priorityB = parseInt(b.dataset.priority);
+                    return priorityB - priorityA; // Higher priority first
+                }
+            });
+
+            // Clear and re-append sorted tasks
+            tasks.forEach(task => container.appendChild(task));
+        }
+
+        function filterTasks() {
+            const selectedObjective = document.getElementById('filter-objective').value;
+            const tasks = document.querySelectorAll('#all-tasks .task-card');
+
+            tasks.forEach(task => {
+                if (selectedObjective === 'all' || task.dataset.objective === selectedObjective) {
+                    task.style.display = '';
+                } else {
+                    task.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize sorting and filtering when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            sortTasks();
+            filterTasks();
+        });
+
+        function toggleObjectiveForm() {
+            const form = document.getElementById('add-objective-form');
+            if (form.style.display === 'none') {
+                form.style.display = 'flex';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        function toggleObjectiveMenu(event, objectiveName) {
+            event.stopPropagation(); // Prevent tab from being selected
+            const menu = document.getElementById(`menu-${objectiveName}`);
+            // Close all other menus first
+            document.querySelectorAll('.settings-menu').forEach(m => {
+                if (m !== menu) m.classList.remove('active');
+            });
+            menu.classList.toggle('active');
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.objective-settings')) {
+                document.querySelectorAll('.settings-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+        });
+
+        function confirmDeleteObjective(objectiveName) {
+            if (confirm(`Are you sure you want to delete "${objectiveName}" and all its tasks? This cannot be undone.`)) {
+                window.location.href = `/delete-objective/${objectiveName}`;
+            }
+        }
+    </script>
+
+    <style>
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .add-tab {
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+        .tab:hover, .add-tab:hover {
+            background-color: #e0e0e0;
+        }
+        .add-objective-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+            height: 100%;
+            align-self: center;
+        }
+        
+        .add-objective-btn.tab-button {
+            padding: 0;
+            border-left: none;
+            background: white;
+        }
+        
+        .add-objective-btn i {
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .add-objective-btn:hover {
+            background-color: #f8f8f8;
+            border-color: #ccc !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .add-objective-btn:hover i {
+            color: #333;
+        }
+        
+        .add-objective-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .tab-button {
+            padding-left: 16px;
+            position: relative;
+            border-left: 4px solid transparent;
+        }
+
+        .tab-button.active {
+            border-left-width: 4px;
+        }
+
+        .objective-settings {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 8px;
+        }
+
+        .settings-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .settings-icon {
+            font-size: 14px;
+            color: #888;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .settings-icon:hover {
+            color: #333;
+            transform: rotate(45deg);
+        }
+
+        .settings-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            min-width: 120px;
+        }
+
+        .settings-menu.active {
+            display: block;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .menu-item i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .menu-item.delete {
+            color: #dc3545;
+        }
+
+        .menu-item.delete:hover {
+            background-color: #fff5f5;
+        }
+
+        .tab-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 100px;
+        }
+
+        .objective-name {
+            margin-bottom: 4px;
+        }
+
+        .progress-bar-mini {
+            width: 100%;
+            height: 3px;
+            background-color: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .tab-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            min-height: 40px;
+        }
+
+        .tab-button.active .progress-fill {
+            opacity: 1;
+        }
+
+        .new-objective-btn {
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+            height: 100%;
+            align-self: center;
+        }
+
+        .new-objective-btn i {
+            font-size: 14px;
+        }
+
+        .new-objective-btn:hover {
+            color: #333;
+        }
+
+        .tab-wrapper:last-child {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .tab-button i {
+            font-size: 14px;
+        }
+    </style>
+</body>
+</html>

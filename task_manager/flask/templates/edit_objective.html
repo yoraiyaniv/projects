@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Objective - AssistAI</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.webp') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Edit Objective</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">Objective Name</label>
+                <input type="text" id="name" name="name" value="{{ objective.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="color">Color</label>
+                <input type="color" id="color" name="color" value="{{ objective.color }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="progress">Progress: <span id="progress-value">{{ objective.progress }}%</span></label>
+                <div class="slider-container">
+                    <input type="range" 
+                           id="progress" 
+                           name="progress" 
+                           min="0" 
+                           max="100" 
+                           value="{{ objective.progress }}"
+                           class="slider" 
+                           oninput="updateProgressValue(this.value)">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="submit-button">Save Changes</button>
+                <a href="{{ url_for('home') }}" class="cancel-button">Cancel</a>
+                <button type="button" 
+                        class="delete-button" 
+                        onclick="confirmDeleteObjective('{{ objective.name }}')">
+                    Delete Objective
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function updateProgressValue(value) {
+            document.getElementById('progress-value').textContent = value + '%';
+        }
+
+        function confirmDeleteObjective(objectiveName) {
+            if (confirm(`Are you sure you want to delete "${objectiveName}" and all its tasks? This cannot be undone.`)) {
+                window.location.href = `/delete-objective/${objectiveName}`;
+            }
+        }
+    </script>
+</body>
+</html> 
